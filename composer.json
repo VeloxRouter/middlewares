@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "veloxrouter/router": "^1.0"
     },
     "autoload": {
         "psr-4": {
