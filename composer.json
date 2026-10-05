@@ -1,0 +1,21 @@
+{
+    "name": "veloxrouter/middlewares",
+    "description": "Official middleware collection for VeloxRouter ecosystem.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ortiz David",
+            "email": "ortizaad1994@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "VeloxRouter\\Middlewares\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
