@@ -15,13 +15,15 @@ class AuditLogMiddleware
      * @param array<string> $methods HTTP methods to audit
      * @param array<string> $onlyPaths Whitelist of URI patterns
      * @param array<string> $exceptPaths Blacklist of URI patterns
+     * @param callable|null $contextResolver Callback to extract extra context (tenant, user, etc.) from the request
      */
     public function __construct(
         private readonly ?LoggerInterface $logger = null,
         private readonly ?string $logPath = null,
         private readonly array $methods = ['POST', 'PUT', 'PATCH', 'DELETE'],
         private readonly array $onlyPaths = [],
-        private readonly array $exceptPaths = ['/login', '/health']
+        private readonly array $exceptPaths = ['/login', '/health'],
+        private readonly $contextResolver = null
     ) {}
 
     public function __invoke(Request $request, Response $response, callable $next): mixed
@@ -66,16 +68,23 @@ class AuditLogMiddleware
             'method'    => $request->method(),
             'uri'       => $request->uri(),
             'status'    => $response->status(),
-            'payload'   => $request->all() ?? [],
         ];
 
-        // Se foi injetado um logger principal (ex: Monolog), usa-o num canal dedicado 'audit'
+        // Se foi fornecido um resolver, injeta dinamicamente o contexto do utilizador/tenant
+        if (is_callable($this->contextResolver)) {
+            $extraContext = call_user_func($this->contextResolver, $request);
+            if (is_array($extraContext)) {
+                $logData = array_merge($extraContext, $logData);
+            }
+        }
+
+        $logData['payload'] = $request->all() ?? [];
+
         if ($this->logger !== null) {
             $this->logger->info('Financial Audit Event', $logData);
             return;
         }
 
-        // Caso contrário, grava no ficheiro isolado por defeito
         if ($this->logPath !== null) {
             $logDir = dirname($this->logPath);
             if (!is_dir($logDir)) {
