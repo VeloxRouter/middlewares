@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace VeloxRouter\Middlewares;
 
-use VeloxRouter\Router\Http\Request;
-use VeloxRouter\Router\Http\Response;
-use VeloxRouter\Contracts\TransactionManagerInterface;
+use VeloxRouter\Http\Request;
+use VeloxRouter\Http\Response;
 use InvalidArgumentException;
 use Throwable;
 
@@ -14,19 +13,14 @@ use Throwable;
  */
 class TransactionMiddleware
 {
-    private TransactionManagerInterface $manager;
+    private object $manager;
 
     /**
-     * @param object|TransactionManagerInterface $manager Database connection or transaction manager
+     * @param object $manager Database connection or transaction manager implementing begin, commit, rollback, inTransaction
      */
     public function __construct(object $manager)
     {
-        if ($manager instanceof TransactionManagerInterface) {
-            $this->manager = $manager;
-            return;
-        }
-
-        // Duck Typing: ensures the object provides the required transaction contract methods
+        // Duck Typing: ensures the object provides the required transaction methods
         $requiredMethods = ['begin', 'commit', 'rollback', 'inTransaction'];
         foreach ($requiredMethods as $method) {
             if (!method_exists($manager, $method)) {
@@ -36,30 +30,7 @@ class TransactionMiddleware
             }
         }
 
-        // Wrap non-implementing managers dynamically into the expected interface
-        $this->manager = new class($manager) implements TransactionManagerInterface {
-            public function __construct(private readonly object $target) {}
-
-            public function begin(): void
-            {
-                $this->target->begin();
-            }
-
-            public function commit(): void
-            {
-                $this->target->commit();
-            }
-
-            public function rollback(): void
-            {
-                $this->target->rollback();
-            }
-
-            public function inTransaction(): bool
-            {
-                return $this->target->inTransaction();
-            }
-        };
+        $this->manager = $manager;
     }
 
     /**
