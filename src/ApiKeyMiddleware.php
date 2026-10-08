@@ -6,8 +6,8 @@ namespace VeloxRouter\Middlewares;
 
 use Psr\Log\LoggerInterface;
 use VeloxRouter\Exceptions\UnauthorizedHttpException;
-use VeloxRouter\Router\Http\Request;
-use VeloxRouter\Router\Http\Response;
+use VeloxRouter\Http\Request;
+use VeloxRouter\Http\Response;
 
 class ApiKeyMiddleware
 {
