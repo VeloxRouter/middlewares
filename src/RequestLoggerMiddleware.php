@@ -27,10 +27,12 @@ class RequestLoggerMiddleware
         $requestId = $request->getAttribute($this->requestIdAttribute) ?? 'N/A';
         
         // Retrieve tenant ID if configured and present in request attributes
-        $tenantId = $this->tenantAttribute ? ($request->getAttribute($this->tenantAttribute) ?? 'N/A') : null;
+        $tenantId = $this->tenantAttribute !== null 
+            ? ($request->getAttribute($this->tenantAttribute) ?? 'N/A') 
+            : null;
 
         $logData = [
-            'request_id' => $requestId,
+            $this->requestIdAttribute => $requestId, // Dynamically uses the configured attribute name as the log key
             'method' => $request->method(),
             'uri' => $request->uri(),
             'status' => $response->getStatusCode(),
@@ -38,7 +40,7 @@ class RequestLoggerMiddleware
             'ip' => $request->ip() ?? 'unknown'
         ];
 
-        if ($tenantId !== null && $this->tenantAttribute !== null) {
+        if ($this->tenantAttribute !== null && $tenantId !== null) {
             $logData[$this->tenantAttribute] = $tenantId;
         }
 
