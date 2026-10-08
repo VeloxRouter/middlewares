@@ -10,8 +10,8 @@ use VeloxRouter\Validator\Validator;
 class ValidationMiddleware
 {
     /**
-     * @param array<string, string> $rules Regras de validação (ex: ['email' => 'required|email'])
-     * @param array<string, string> $messages Mensagens customizadas opcionais
+     * @param array<string, string> $rules Validation rules (e.g., ['email' => 'required|email'])
+     * @param array<string, string> $messages Optional custom messages
      */
     public function __construct(
         private readonly array $rules,
@@ -20,7 +20,7 @@ class ValidationMiddleware
 
     public function __invoke(Request $request, Response $response, callable $next): mixed
     {
-        // 1. Recolhe dados combinando query parameters e o corpo da requisição (JSON ou form)
+        // Gather data by combining query parameters and request body (JSON or form)
         $queryData = $request->query() ?? [];
         $bodyData = $request->body() ?? [];
         $data = array_merge(
@@ -28,10 +28,10 @@ class ValidationMiddleware
             is_array($bodyData) ? $bodyData : []
         );
 
-        // 2. Deteta o idioma preferencial via header HTTP (default: pt)
-        $acceptLang = $request->header('Accept-Language') ?? 'pt';
+        // Detect preferred language via HTTP header (default: en)
+        $acceptLang = $request->header('Accept-Language') ?? 'en';
 
-        // 3. Instancia e executa o motor de validação puro
+        // Instantiate and run the core validation engine
         $validator = new Validator($data, $this->rules, $this->messages, $acceptLang);
 
         if ($validator->fails()) {
