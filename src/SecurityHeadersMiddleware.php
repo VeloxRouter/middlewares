@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace VeloxRouter\Middlewares;
 
-use VeloxRouter\Router\Http\Request;
-use VeloxRouter\Router\Http\Response;
-use VeloxRouter\Router\Middleware\MiddlewareInterface;
+use VeloxRouter\Http\Request;
+use VeloxRouter\Http\Response;
+use VeloxRouter\Middleware\MiddlewareInterface;
 
 class SecurityHeadersMiddleware implements MiddlewareInterface
 {
@@ -19,7 +19,7 @@ class SecurityHeadersMiddleware implements MiddlewareInterface
         /** @var Response $response */
         $response = $next($request);
 
-        // 1. Hardening Essencial (OWASP Standard)
+        // Essential Hardening (OWASP Standard)
         $response->setHeader('X-Frame-Options', $this->customPolicies['X-Frame-Options'] ?? 'DENY');
         $response->setHeader('X-Content-Type-Options', $this->customPolicies['X-Content-Type-Options'] ?? 'nosniff');
         $response->setHeader('Referrer-Policy', $this->customPolicies['Referrer-Policy'] ?? 'strict-origin-when-cross-origin');
@@ -27,7 +27,7 @@ class SecurityHeadersMiddleware implements MiddlewareInterface
         $response->setHeader('Permissions-Policy', $this->customPolicies['Permissions-Policy'] ?? 'geolocation=(), microphone=(), camera=()');
         $response->setHeader('Content-Security-Policy', $this->customPolicies['Content-Security-Policy'] ?? "default-src 'none'; frame-ancestors 'none';");
 
-        // 2. Isolamento de Origem Avançado (Opcional / Big Tech)
+        // Advanced Origin Isolation (Optional / Big Tech standard)
         if (isset($this->customPolicies['Cross-Origin-Opener-Policy'])) {
             $response->setHeader('Cross-Origin-Opener-Policy', $this->customPolicies['Cross-Origin-Opener-Policy']);
         }
@@ -36,7 +36,7 @@ class SecurityHeadersMiddleware implements MiddlewareInterface
             $response->setHeader('Cross-Origin-Resource-Policy', $this->customPolicies['Cross-Origin-Resource-Policy']);
         }
 
-        // 3. HSTS Inteligente (Apenas se HTTPS ativo)
+        // Smart HSTS (Applied only if HTTPS is active)
         if ($this->shouldApplyHsts($request)) {
             $hstsValue = $this->customPolicies['Strict-Transport-Security'] ?? 'max-age=31536000; includeSubDomains; preload';
             $response->setHeader('Strict-Transport-Security', $hstsValue);
