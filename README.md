@@ -64,26 +64,36 @@ The VeloxRouter middleware suite is categorized into security, resilience, data 
 
 ---
 
-## 🚀 Usage Example (Composing a Pipeline)
+## 🚀 Usage Examples
 
-Here is how you can seamlessly chain multiple middlewares in your VeloxRouter application:
+### 1. Global Pipeline Configuration
+
+Ideal for system-wide concerns like request tracing, security headers, and error handling:
 
 ```php
 use VeloxRouter\Router\Router;
 use VeloxRouter\Middlewares\RequestIdMiddleware;
 use VeloxRouter\Middlewares\SecurityHeadersMiddleware;
+use VeloxRouter\Middlewares\RequestLoggerMiddleware;
+
+$router = new Router();
+
+$router->addGlobalMiddleware(new RequestIdMiddleware());$router->addGlobalMiddleware(new SecurityHeadersMiddleware());
+$router->addGlobalMiddleware(new RequestLoggerMiddleware($logger));
+
+```
+
+### 2. Route-Specific Pipeline (Transactional API Endpoint)
+
+Ideal for data-mutating routes requiring payload validation, traffic control, and automatic transaction safety:
+
+```php
 use VeloxRouter\Middlewares\RateLimiterMiddleware;
 use VeloxRouter\Middlewares\TimeoutMiddleware;
 use VeloxRouter\Middlewares\JsonBodyMiddleware;
 use VeloxRouter\Middlewares\ValidationMiddleware;
 use VeloxRouter\Middlewares\TransactionMiddleware;
 
-$router = new Router();
-
-// Global pipeline applied to all routes
-$router->addGlobalMiddleware(new RequestIdMiddleware());$router->addGlobalMiddleware(new SecurityHeadersMiddleware());
-
-// Route-specific pipeline with protection, timeout, and transaction safety
 $router->post('/api/v1/orders', [OrderController::class, 'store'], [
     new RateLimiterMiddleware(maxAttempts: 20, decaySeconds: 60),
     new TimeoutMiddleware(10),
@@ -99,3 +109,4 @@ $router->post('/api/v1/orders', [OrderController::class, 'store'], [
 ## License
 
 The VeloxRouter Middlewares package is open-source software licensed under the [MIT license](https://www.google.com/search?q=LICENSE).
+est
