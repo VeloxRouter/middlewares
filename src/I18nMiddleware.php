@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace VeloxRouter\Middlewares;
 
 use Psr\Log\LoggerInterface;
-use VeloxRouter\Router\Http\Request;
-use VeloxRouter\Router\Http\Response;
+use VeloxRouter\Http\Request;
+use VeloxRouter\Http\Response;
 
 class I18nMiddleware
 {
@@ -18,18 +18,17 @@ class I18nMiddleware
 
     public function __invoke(Request $request, Response $response, callable $next): mixed
     {
-        // Lê o header Accept-Language do request HTTP
+        // Read the Accept-Language header from the HTTP request
         $headerLang = $request->header('Accept-Language');
 
         $lang = $this->defaultLanguage;
 
         if (!empty($headerLang)) {
-            // Pega os primeiros 2 caracteres (ex: 'pt-BR' ou 'pt-PT' vira 'pt') ou usa o código completo
-            // Aqui podes optar por normalizar (ex: substr($headerLang, 0, 2)) ou aceitar o valor completo
+            // Extract the first 2 characters (e.g., 'pt-BR' or 'pt-PT' becomes 'pt')
             $lang = trim(substr($headerLang, 0, 2));
         }
 
-        // Define o idioma nos atributos do Request (para o ErrorMiddleware ou Controllers acederem)
+        // Set the language in the Request attributes (accessible to ErrorMiddleware or Controllers)
         $request->setAttribute($this->languageAttribute, $lang);
 
         if ($this->logger !== null) {
