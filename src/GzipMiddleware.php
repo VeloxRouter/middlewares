@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace VeloxRouter\Middlewares;
 
-use VeloxRouter\Router\Http\Request;
-use VeloxRouter\Router\Http\Response;
+use VeloxRouter\Http\Request;
+use VeloxRouter\Http\Response;
 
 class GzipMiddleware
 {
