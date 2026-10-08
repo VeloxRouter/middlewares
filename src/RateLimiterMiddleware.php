@@ -6,8 +6,8 @@ namespace VeloxRouter\Middlewares;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\Log\LoggerInterface;
-use VeloxRouter\Router\Http\Request;
-use VeloxRouter\Router\Http\Response;
+use VeloxRouter\Http\Request;
+use VeloxRouter\Http\Response;
 
 class RateLimiterMiddleware
 {
